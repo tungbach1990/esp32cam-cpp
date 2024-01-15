@@ -133,6 +133,7 @@ void pull_all(String tree_url, String raw_url, bool isconnected) {
   if (sizeof(internal_tree) > 0) {
     Serial.println("leftover!");
     for (int i = 0; i < 100; i++) {
+      print("nothing")
       // Implement logic to delete files manually
     }
   }
