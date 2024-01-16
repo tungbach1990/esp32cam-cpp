@@ -11,13 +11,15 @@ bool isValidContentType = false;
 
 // Your SSID and PSWD that the chip needs
 // to connect to
-const char* SSID = "your-ssid";
-const char* PSWD = "your-password";
+const char* SSID = "Viettel Post";
+const char* PSWD = "2010#ctbc";
 
 // Git Repository Config
 String host = "raw.githubusercontent.com";
 int port = 443; // HTTPS port
 String bin = "/tungbach1990/esp32cam-cpp/main/build/esp32.esp32.esp32cam/newOTA.ino.bin"; // path to the binary file
+String token = "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";
+
 
 // Utility to extract header value from headers
 String getHeaderValue(String header, String headerName) {
@@ -33,11 +35,19 @@ void execOTA() {
     Serial.println("Fetching Bin: " + String(bin));
 
     // Get the contents of the binary file
+    String authorizationHeader = (token.length() > 0) ? "Bearer " + String(token) : "";
     client.print(String("GET ") + bin + " HTTP/1.1\r\n" +
                  "Host: " + host + "\r\n" +
                  "Cache-Control: no-cache\r\n" +
-                 "Connection: close\r\n\r\n");
-
+                 "Connection: close\r\n" +
+                 (authorizationHeader.length() > 0 ? "Authorization: " + authorizationHeader + "\r\n" : "") +
+                 "\r\n");
+    Serial.println(String("GET ") + bin + " HTTP/1.1\r\n" +
+                 "Host: " + host + "\r\n" +
+                 "Cache-Control: no-cache\r\n" +
+                 "Connection: close\r\n" +
+                 (authorizationHeader.length() > 0 ? "Authorization: " + authorizationHeader + "\r\n" : "") +
+                 "\r\n");
     unsigned long timeout = millis();
     while (client.available() == 0) {
       if (millis() - timeout > 5000) {
