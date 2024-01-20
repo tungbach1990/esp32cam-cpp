@@ -36,6 +36,7 @@ String version = "0.1.1";
 // Your SSID and PSWD that the chip needs
 // to connect to
 const char* SSID = "Viettel Post";
+const char* wifi[2][2] = {{"Viettel Post","2010#ctbc"},{"BACHNT-IN","bachnt2211"}};
 const char* PSWD = "2010#ctbc";
 
 // Git Repository Config
@@ -245,6 +246,7 @@ void setup() {
   }
   // Connection Succeed
   Serial.println("");
+  Serial.println("Number of elements in the 2D array: " + String(sizeof(wifi) / sizeof(wifi[0][0])));
   Serial.println("Connected to " + String(SSID));
   Serial.println("");
   Serial.println("");
