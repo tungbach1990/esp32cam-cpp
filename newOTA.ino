@@ -24,6 +24,7 @@
 #include <Update.h>
 #include <HTTPClient.h>
 
+HTTPClient http;
 
 WiFiClientSecure client;
 
@@ -31,18 +32,22 @@ WiFiClientSecure client;
 // response from S3
 int contentLength = 0;
 bool isValidContentType = false;
-String version = "0.1.1";
+String version = "0.1.2";
 
 // Your SSID and PSWD that the chip needs
 // to connect to
 const char* SSID = "Viettel Post";
-const char* wifi[2][2] = {{"Viettel Post","2010#ctbc"},{"BACHNT-IN","bachnt2211"}};
 const char* PSWD = "2010#ctbc";
 
 // Git Repository Config
-String  host = "raw.githubusercontent.com";
+String host = "raw.githubusercontent.com";
+String username = "tungbach1990";
+String projectname = "esp32cam-cpp";
 int port = 443; // HTTPS port
-String bin = "/tungbach1990/esp32cam-cpp/main/build/esp32.esp32.esp32wrover/newOTA.ino.bin"; // path to the binary file
+String rootpath = String(host) + "/" + String(username) + "/" + String(projectname) + "/main/";
+String pathbin = "build/esp32.esp32.esp32wrover/newOTA.ino.bin";
+String bin = String(rootpath) + String(pathbin); // path to the binary file
+String versionpath = String(rootpath) + "version";
 String token = "";//"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";
 const char* root_ca = \
     "-----BEGIN CERTIFICATE-----\n"
@@ -232,6 +237,30 @@ void execOTA() {
     client.flush();
   }
 }
+
+bool needUpdate() {
+  http.begin("https://" + String(versionpath));
+  int httpCode = http.GET();
+
+  // Check for a successful request
+  if (httpCode != 200) {
+    Serial.printf("HTTP GET request failed, error code: %d\n", httpCode);
+    return false;
+  }
+  Serial.printf("HTTP GET request successful, status code: %d\n", httpCode);
+
+  // Get the response payload
+  String versionOnline = http.getString();
+  if (versionOnline == version)
+    return false;
+  Serial.println("version online");
+  Serial.println(versionOnline);
+
+  // Close the connection
+  http.end();
+  return true;
+
+}
 void setup() {
   //Begin Serial
   Serial.begin(115200);
@@ -246,7 +275,6 @@ void setup() {
   }
   // Connection Succeed
   Serial.println("");
-  Serial.println("Number of elements in the 2D array: " + String(sizeof(wifi) / sizeof(wifi[0][0])));
   Serial.println("Connected to " + String(SSID));
   Serial.println("");
   Serial.println("");
@@ -254,12 +282,15 @@ void setup() {
   Serial.println("");
   Serial.println("");
   // Execute OTA Update
-  execOTA();
+  if (needUpdate() == false)
+    Serial.println("Không cần update");
+  else
+    execOTA();
   
-
 }
+  
 void loop() {
- sleep(100);
+ sleep(1000);
 }
 /*
    Serial Monitor log for this sketch
