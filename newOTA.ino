@@ -32,7 +32,7 @@ WiFiClientSecure client;
 // response from S3
 int contentLength = 0;
 bool isValidContentType = false;
-String version = "0.1.2";
+const char* version = "0.1.1";
 
 // Your SSID and PSWD that the chip needs
 // to connect to
@@ -250,9 +250,11 @@ bool needUpdate() {
   Serial.printf("HTTP GET request successful, status code: %d\n", httpCode);
 
   // Get the response payload
-  String versionOnline = http.getString();
-  if (versionOnline == version)
+  const char* versionOnline = http.getString().c_str();
+  Serial.println(String(String(versionOnline) == String(version)));
+  if (strcmp(versionOnline,version) == 0) {
     return false;
+  }
   Serial.println("version online");
   Serial.println(versionOnline);
 
@@ -282,10 +284,12 @@ void setup() {
   Serial.println("");
   Serial.println("");
   // Execute OTA Update
-  if (needUpdate() == false)
+  if (needUpdate() == false) {
     Serial.println("Không cần update");
-  else
+  }
+  else {
     execOTA();
+  }
   
 }
   
